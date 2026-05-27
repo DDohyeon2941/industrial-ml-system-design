@@ -2,17 +2,23 @@
 
 ## Overview
 
-실제 산업 데이터 환경에서 수행한 Machine Learning 시스템 설계 경험과
-데이터 처리 구조를 정리한 저장소입니다.
+This repository summarizes practical experiences in industrial machine learning system design and large-scale manufacturing data processing.
 
-산업 데이터 환경에서는 데이터 정합성 문제, 시계열 불일치,
-대용량 데이터 처리, 운영 환경 제약 등 다양한 문제가 동시에 발생합니다.
+Unlike benchmark datasets or competition environments,
+real industrial datasets are generated continuously from multiple independent systems under operational constraints.
 
-본 저장소는 이러한 문제들을 실제 프로젝트에서 어떻게 해결하고자 했는지,
-그리고 어떤 방향으로 ML 시스템을 설계했는지를 중심으로 정리합니다.
+The projects described here focused not only on model performance,
+but also on:
 
-특정 고객사 및 내부 시스템 정보는 제외하였으며,
-일반화 가능한 문제 구조와 해결 접근 방식을 중심으로 작성하였습니다.
+- data consistency
+- time-series synchronization
+- large-scale data processing
+- feature engineering
+- ETL pipeline design
+- operational feasibility
+- maintainable ML workflows
+
+All descriptions are generalized and exclude confidential customer information or internal system details.
 
 ---
 
@@ -22,13 +28,36 @@
 
 ## Overview
 
-2차전지 전구체 제조 공정 데이터를 활용하여
-Ni, Co, Mn, Li 등 주요 성분 값을 예측하는
-머신러닝 시스템을 설계한 프로젝트입니다.
+This project focused on designing machine learning systems
+for predicting material composition variables
+such as Ni, Co, Mn, and Li
+from battery manufacturing process data.
 
-공정 센서 데이터와 분석 데이터의 수집 주기가 서로 달랐으며,
-시계열 정합성 문제를 해결하기 위한
-feature engineering 및 데이터 동기화 구조 설계가 핵심 과제였습니다.
+One of the major challenges was that
+process sensor data and laboratory analysis data
+were collected at different sampling intervals.
+
+As a result,
+time-series synchronization and process-aware feature engineering
+became critical components of the system design.
+
+---
+
+## Why This Problem Was Challenging
+
+In battery manufacturing environments,
+process variables are often indirectly connected to final composition measurements.
+
+Additionally:
+
+- sensor data and laboratory data are generated independently
+- timestamps are not perfectly synchronized
+- process conditions evolve continuously
+- distributions vary depending on operational states
+
+Therefore,
+the primary challenge was not only training predictive models,
+but also constructing reliable learning datasets from heterogeneous manufacturing systems.
 
 ---
 
@@ -36,52 +65,113 @@ feature engineering 및 데이터 동기화 구조 설계가 핵심 과제였습
 
 ### Irregular Sampling Interval
 
-센서별 데이터 수집 간격이 서로 달라
-동일 시점 기준으로 데이터를 직접 비교하기 어려웠습니다.
+Different sensors generated data at different frequencies.
 
-일부 데이터는 초 단위,
-일부 분석 데이터는 수분~수시간 단위로 기록되어
-시계열 기반 동기화 구조가 필요했습니다.
+Some process variables were recorded every few seconds,
+while laboratory measurements were recorded every several minutes or hours.
+
+This made direct comparison across variables difficult
+without proper synchronization logic.
 
 ---
 
 ### Timestamp Mismatch
 
-공정 데이터와 분석 데이터 간 timestamp mismatch가 존재하였으며,
-실제 공정 시점과 데이터 저장 시점 간 차이도 발생했습니다.
+Timestamp mismatches existed between process systems and analysis systems.
 
-이로 인해 target leakage를 방지하면서
-의미 있는 feature를 생성하는 과정이 필요했습니다.
+In some cases,
+the actual production timing and the recorded storage timing differed significantly.
+
+This required careful preprocessing
+to prevent target leakage during feature generation.
 
 ---
 
 ### Feature Consistency
 
-동일 변수라도 공정 상황에 따라 분포가 달라졌으며,
-공정 구간별 특성을 반영한 feature engineering이 필요했습니다.
+Feature distributions changed depending on production conditions.
 
-특히 rolling statistics 및 변화량 기반 feature 생성이 중요했습니다.
+As a result,
+process-aware feature engineering strategies were necessary.
+
+Rolling statistics,
+aggregation-based features,
+and temporal change features
+became important components of the pipeline.
 
 ---
 
 ## My Contributions
 
-- 시계열 기반 데이터 동기화 로직 설계
-- rolling / diff / aggregation 기반 feature engineering
-- 공정 구간 기반 변수 생성
-- multivariate manufacturing time-series 처리
-- 성분별 개별 ML pipeline 구축
-- 모델 학습 / 검증 / 예측 파이프라인 모듈화
-- 모델별 성능 비교 구조 설계
-- 데이터 정합성 검증 로직 설계
+- Designed time-series synchronization logic
+- Developed rolling / diff / aggregation-based feature engineering pipelines
+- Built process-aware feature generation structures
+- Processed multivariate manufacturing time-series data
+- Designed target-specific ML pipelines for each composition variable
+- Modularized training / validation / inference workflows
+- Designed reproducible preprocessing structures
+- Implemented data consistency validation logic
+
+---
+
+## Why Multivariate Prediction Was Important
+
+The project focused on predicting multiple composition variables simultaneously
+from manufacturing process data.
+
+Because each target variable had different distributions,
+sensitivities,
+and process relationships,
+individualized preprocessing and feature engineering strategies were required for each prediction target.
+
+---
+
+## System Design Considerations
+
+The system was designed considering not only offline experimentation,
+but also operational maintainability.
+
+Key considerations included:
+
+- reproducible preprocessing pipelines
+- scalable feature generation structures
+- maintainable ML workflows
+- stable inference behavior
+- validation-friendly preprocessing logic
+
+Particular emphasis was placed on constructing pipelines
+that could continuously validate incoming manufacturing data.
+
+---
+
+## Key Design Decisions
+
+### Why Feature Engineering Was Prioritized
+
+In industrial machine learning environments,
+feature quality and data consistency often had greater impact
+than increasing model complexity.
+
+Therefore,
+the project prioritized:
+
+- process-aware feature generation
+- time-series synchronization
+- validation logic
+- operational robustness
+- maintainable preprocessing pipelines
+
+rather than relying solely on highly complex modeling approaches.
 
 ---
 
 ## Key Learnings
 
-- 산업 데이터에서는 데이터 정합성이 모델 복잡도보다 중요할 수 있음
-- Feature Engineering이 모델 성능에 큰 영향을 미침
-- 실제 운영 환경에서는 inference 안정성과 유지보수성을 함께 고려해야 함
+- Data consistency can be more important than model complexity
+- Feature engineering significantly impacts industrial ML performance
+- Industrial datasets require system-level preprocessing strategies
+- Operational feasibility must be considered early in ML system design
+- Industrial ML problems are often system design problems rather than isolated modeling problems
 
 ---
 
@@ -89,13 +179,40 @@ feature engineering 및 데이터 동기화 구조 설계가 핵심 과제였습
 
 ## Overview
 
-제조 검사 데이터를 기반으로
-품질 안정화를 위한 압력 추천 시스템 및
-Industrial AI 데이터 파이프라인 구조를 설계한 프로젝트입니다.
+This project focused on designing
+a manufacturing inspection AI system
+and pressure recommendation pipeline
+using inspection and production data.
 
-검사 장비와 생산 시스템 간 데이터 구조 차이,
-대규모 bump-level 데이터 처리,
-공정 간 데이터 정합성 문제가 핵심 과제였습니다.
+The system aimed to improve process quality stability
+through inspection-driven process pressure recommendations.
+
+Major challenges included:
+
+- multi-source inspection data integration
+- large-scale bump-level data processing
+- timestamp inconsistency
+- process alignment across manufacturing stages
+- operational constraints in production environments
+
+---
+
+## Why This Problem Was Challenging
+
+In manufacturing inspection environments,
+quality measurements are often influenced
+by multiple upstream process conditions simultaneously.
+
+Additionally:
+
+- production systems and inspection systems are physically separated
+- inspection timing may occur much later than production timing
+- identifiers may not perfectly align across systems
+- operational constraints limit the use of highly complex models
+
+As a result,
+the project required both machine learning knowledge
+and system-level data engineering considerations.
 
 ---
 
@@ -103,67 +220,178 @@ Industrial AI 데이터 파이프라인 구조를 설계한 프로젝트입니�
 
 ### Multi-source Inspection Data
 
-여러 검사 장비 및 생산 시스템에서
-서로 다른 구조의 데이터가 생성되었습니다.
+Multiple inspection systems generated data
+with different structures and identification schemes.
 
-파일 구조, timestamp 기준,
-식별 체계 등이 서로 달라
-데이터 통합 과정에서 정합성 검증이 필요했습니다.
+Differences included:
+
+- file structures
+- timestamp formats
+- naming conventions
+- identifier systems
+- inspection granularity
+
+Therefore,
+cross-system consistency validation became a critical requirement.
 
 ---
 
 ### Large-scale Manufacturing Data
 
-bump-level 데이터와 같이
-고용량 제조 데이터를 처리해야 했으며,
-효율적인 staging 구조와 적재 전략이 필요했습니다.
+The project required processing large-scale manufacturing datasets,
+including bump-level inspection data.
 
-특히 parquet 기반의 데이터 처리 구조를 검토하며,
-대규모 데이터 처리 효율 개선을 고려했습니다.
+Efficient staging structures
+and scalable data processing pipelines
+became necessary for handling high-volume datasets.
+
+Parquet-based staging structures were evaluated
+to improve large-scale processing efficiency.
 
 ---
 
 ### Process Alignment
 
-공정 간 strip / unit alignment 문제로 인해
-동일 생산 단위를 연결하는 과정이 필요했습니다.
+The project required aligning production units
+across multiple manufacturing stages.
 
-또한 생산 데이터와 검사 데이터 간
-timestamp inconsistency 문제도 함께 존재했습니다.
+This included:
+
+- strip-level alignment
+- unit-level matching
+- timestamp consistency validation
+- production-inspection linkage validation
+
+Reliable process alignment became essential
+before constructing ML-ready datasets.
 
 ---
 
 ### Production Constraints
 
-실제 생산 환경에서는
-단순 모델 성능보다 운영 가능성과 안정성이 중요했습니다.
+In real manufacturing environments,
+model accuracy alone is insufficient.
 
-데이터 수집 방식,
-검사 흐름,
-실시간 추론 가능성 등을 함께 고려해야 했습니다.
+Operational feasibility was equally important.
+
+Key operational considerations included:
+
+- inference stability
+- explainability
+- maintainability
+- real-time operational constraints
+- production workflow compatibility
 
 ---
 
 ## My Contributions
 
-- 제조 검사 데이터 ETL 구조 설계
-- parquet 기반 staging 구조 검토
-- inspection timestamp validation 로직 설계
-- multi-source manufacturing data integration
-- 데이터 품질 검증 기준 정의
-- inspection data consistency 검증
-- 압력 추천 시스템을 위한 데이터 구조 설계
-- 운영 환경 기반 평가 기준 및 활용 전략 논의
-- production ML pipeline 구조 검토
+- Designed manufacturing inspection ETL structures
+- Evaluated parquet-based staging pipelines
+- Designed inspection timestamp validation logic
+- Integrated multi-source manufacturing datasets
+- Defined data quality validation strategies
+- Implemented inspection consistency validation logic
+- Designed data structures for pressure recommendation systems
+- Discussed evaluation criteria and operational usage strategies
+- Reviewed production-oriented ML pipeline structures
+
+---
+
+## Why Pressure Recommendation Was Important
+
+The project aimed to improve manufacturing quality stability
+by recommending process pressure conditions
+based on inspection and production data.
+
+However,
+quality measurements were influenced not only by process pressure,
+but also by:
+
+- upstream process conditions
+- inspection consistency
+- operational variability
+- manufacturing environment changes
+
+Therefore,
+reliable data validation and process alignment
+became critical prerequisites before model training.
+
+---
+
+## System Design Considerations
+
+The system was designed considering potential deployment environments
+rather than only offline experimentation.
+
+Key considerations included:
+
+- scalable ETL structures
+- validation-friendly preprocessing pipelines
+- operationally maintainable workflows
+- large-scale data handling
+- stable production inference structures
+
+Special attention was given to continuously validating
+incoming inspection and production data.
+
+---
+
+## Key Design Decisions
+
+### Why Validation Logic Was Critical
+
+In manufacturing inspection environments,
+incorrectly aligned data can easily produce misleading ML results.
+
+Therefore,
+the project emphasized:
+
+- timestamp validation
+- identifier normalization
+- cross-system consistency checks
+- abnormal data filtering
+- process-aware validation logic
+
+before focusing on model complexity.
 
 ---
 
 ## Key Learnings
 
-- 실제 산업 데이터는 이상적인 구조로 존재하지 않음
-- 데이터 품질 검증이 ETL 과정에서 매우 중요함
-- 운영 가능한 ML 구조 설계가 핵심
-- 시스템 관점의 접근이 모델 자체보다 중요할 수 있음
+- Industrial datasets rarely exist in ideal forms
+- Data validation is critical in manufacturing ETL pipelines
+- Production ML systems require operationally maintainable structures
+- Reliable preprocessing pipelines are essential for industrial AI
+- Industrial ML problems often require system-level thinking
+
+---
+
+# Why Industrial ML is Different
+
+Unlike benchmark datasets,
+industrial datasets are continuously generated
+from multiple heterogeneous systems under operational constraints.
+
+Common issues included:
+
+- inconsistent timestamps
+- missing inspection records
+- identifier mismatches
+- evolving production flows
+- unstable data quality
+- irregular sampling intervals
+
+As a result,
+successful industrial AI systems require much more than model accuracy.
+
+They require:
+
+- reliable data structures
+- scalable preprocessing pipelines
+- validation logic
+- operational feasibility
+- maintainable workflows
 
 ---
 
@@ -179,13 +407,20 @@ timestamp inconsistency 문제도 함께 존재했습니다.
 - Production ML System
 - Large-scale Data Processing
 - Manufacturing Inspection Data
+- Pressure Recommendation System
+- Battery Manufacturing AI
+- Industrial Time-Series Processing
 - Imbalanced Learning
 
 ---
 
 # Disclaimer
 
-본 저장소는 산업 데이터 환경에서의 경험 및 문제 해결 방향을 정리한 저장소이며,
-특정 고객사 및 내부 시스템 정보는 포함하지 않습니다.
+This repository summarizes generalized industrial machine learning experiences
+and system design considerations.
 
-모든 내용은 일반화된 형태로 작성되었습니다.
+All customer-specific information,
+internal system details,
+production configurations,
+and confidential operational information
+have been excluded.
