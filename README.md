@@ -43,6 +43,14 @@ became critical components of the system design.
 
 ---
 
+## Industrial Time-Series Synchronization Pipeline
+
+![Battery Manufacturing Time-Series Synchronization Pipeline](이차전지그림.png)
+
+The pipeline aggregated historical process information
+from heterogeneous manufacturing systems
+and aligned them to irregular laboratory analysis timestamps
+while preventing future information leakage.
 ## Why This Problem Was Challenging
 
 In battery manufacturing environments,
