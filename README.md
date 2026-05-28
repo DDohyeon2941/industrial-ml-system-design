@@ -185,6 +185,8 @@ rather than relying solely on highly complex modeling approaches.
 
 # 2. Manufacturing Inspection AI System
 
+# 2. Manufacturing Inspection AI System
+
 ## Overview
 
 This project focused on designing
@@ -202,6 +204,22 @@ Major challenges included:
 - timestamp inconsistency
 - process alignment across manufacturing stages
 - operational constraints in production environments
+
+---
+
+## Validation-Centric Manufacturing ETL Pipeline
+
+![Validation-Centric Manufacturing ETL Pipeline](코이닝그림.png)
+
+The pipeline validated inspection metadata first,
+uploaded metadata tables to the database,
+and then performed bump-level filtering,
+alignment,
+and relation matching using validated metadata.
+
+This meta-first strategy improved consistency,
+prevented invalid process pair construction,
+and enabled reliable bump-level manufacturing analysis.
 
 ---
 
