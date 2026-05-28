@@ -185,8 +185,6 @@ rather than relying solely on highly complex modeling approaches.
 
 # 2. Manufacturing Inspection AI System
 
-# 2. Manufacturing Inspection AI System
-
 ## Overview
 
 This project focused on designing
